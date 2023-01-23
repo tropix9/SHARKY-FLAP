@@ -120,24 +120,23 @@ def passwordchecker():
          
     
 def login():
-   #set a variable (boolean type) to true if the user is NOT logged on
    notloggedin="true"
-   #while the user is not logged on (i.e. while the login credentials provided do not work ...)
+   #prompts user to login while not logged in
    while notloggedin=="true":
       print("***WELCOME - PLEASE LOGIN")
    
-   #open the file we are reading from
+   #open file for the data
       with open("fakeflixfile.txt",'r') as fakeflixfile:
-     #prompt the user to enter their login details
+     #tell user to input login info
          username=input("Enter Name:-")
          password=input("Enter password (after entering password, press enter twice):-")
-      #call upon our reader (this allows us to work with our file)
+  
          fakeflixfileReader=csv.reader(fakeflixfile)
-      #for each row that is read by the Reader
+    
          for row in fakeflixfileReader:
             for field in row:
             
-            #search for the required matches in user entry against what is stored in the file
+            #search for the login info in the stored file
                if field==username and row[1]==password:
                   print("Granted")
                   displayfilms()
@@ -159,7 +158,7 @@ def displayfilms():
     
 main()
 
-
+#choice to see how to play or go straight to game
 while True:
     try:
         washroom_choice = int(input(" \n  \n \n PRESS 1 To View How to Play/Credits, Press 0 To go straight to Game : \n  "))
@@ -174,7 +173,7 @@ while True:
         print("")
         print("MUST BE ONE OF THE OPTIONS")
         print("")
-if (washroom_choice == 1): #if its 1, print whats under
+if (washroom_choice == 1): #if the users option is 1, enter whats under
   print ('''SeaLife Saver is by LVS
             The objective is to get past the plastic waste in the ocean to save the animal
             1. Press Spacebar to start the game
@@ -184,12 +183,11 @@ if (washroom_choice == 1): #if its 1, print whats under
 FPS = 30
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
-PIPEGAPSIZE  = 140 # gap between upper and lower part of pipe
+PIPEGAPSIZE  = 140 # gap between the two pipes upper and lower
 BASEY        = SCREENHEIGHT * 0.79
-# image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
-# list of all possible players (tuple of 3 positions of flap)
+# sprite files
 PLAYERS_LIST = (
     # shark
     (
@@ -237,7 +235,7 @@ def main():
     SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     pygame.display.set_caption('SeaLife Saver')
 
-    # numbers sprites for score display
+    # images for the score display
     IMAGES['numbers'] = (
         pygame.image.load('assets/sprites/0.png').convert_alpha(),
         pygame.image.load('assets/sprites/1.png').convert_alpha(),
@@ -251,14 +249,14 @@ def main():
         pygame.image.load('assets/sprites/9.png').convert_alpha()
     )
 
-    # game over sprite
+    # iamges for gameover
     IMAGES['gameover'] = pygame.image.load('assets/sprites/gameover.png').convert_alpha()
-    # message sprite for welcome screen
+    # images for start screen
     IMAGES['message'] = pygame.image.load('assets/sprites/message.png').convert_alpha()
-    # base (ground) sprite
+    # bottom of the ocean image
     IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
 
-    # sounds
+    # sound sprites
     if 'win' in sys.platform:
         soundExt = '.wav'
     else:
@@ -271,11 +269,11 @@ def main():
     SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/wing' + soundExt)
 
     while True:
-        # select random background sprites
+        # random background
         randBg = random.randint(0, len(BACKGROUNDS_LIST) - 1)
         IMAGES['background'] = pygame.image.load(BACKGROUNDS_LIST[randBg]).convert()
 
-        # select random player sprites
+        # random animal
         randPlayer = random.randint(0, len(PLAYERS_LIST) - 1)
         IMAGES['player'] = (
             pygame.image.load(PLAYERS_LIST[randPlayer][0]).convert_alpha(),
@@ -283,7 +281,7 @@ def main():
             pygame.image.load(PLAYERS_LIST[randPlayer][2]).convert_alpha(),
         )
 
-        # select random pipe sprites
+        # random plastic waste
         pipeindex = random.randint(0, len(PIPES_LIST) - 1)
         IMAGES['pipe'] = (
             pygame.transform.flip(
@@ -291,13 +289,12 @@ def main():
             pygame.image.load(PIPES_LIST[pipeindex]).convert_alpha(),
         )
 
-        # hismask for pipes
+        
         HITMASKS['pipe'] = (
             getHitmask(IMAGES['pipe'][0]),
             getHitmask(IMAGES['pipe'][1]),
         )
 
-        # hitmask for player
         HITMASKS['player'] = (
             getHitmask(IMAGES['player'][0]),
             getHitmask(IMAGES['player'][1]),
@@ -311,10 +308,10 @@ def main():
 
 def showWelcomeAnimation():
     """Shows welcome screen animation of Sealife Saver"""
-    # index of player to blit on screen
+    #welcome
     playerIndex = 0
     playerIndexGen = cycle([0, 1, 2, 1])
-    # iterator used to change playerIndex after every 5th iteration
+   
     loopIter = 0
 
     playerx = int(SCREENWIDTH * 0.2)
@@ -324,10 +321,10 @@ def showWelcomeAnimation():
     messagey = int(SCREENHEIGHT * 0.12)
 
     basex = 0
-    # amount by which base can maximum shift to left
+    # base image when moving
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
 
-    # player shm for up-down motion on welcome screen
+    # The up and down movement of the animal when it is stationary
     playerShmVals = {'val': 0, 'dir': 1}
 
     while True:
@@ -336,7 +333,7 @@ def showWelcomeAnimation():
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
-                # make first flap sound and return values for mainGame
+                # flap sound
                 SOUNDS['wing'].play()
                 return {
                     'playery': playery + playerShmVals['val'],
@@ -344,14 +341,14 @@ def showWelcomeAnimation():
                     'playerIndexGen': playerIndexGen,
                 }
 
-        # adjust playery, playerIndex, basex
+        
         if (loopIter + 1) % 5 == 0:
             playerIndex = next(playerIndexGen)
         loopIter = (loopIter + 1) % 30
         basex = -((-basex + 4) % baseShift)
         playerShm(playerShmVals)
 
-        # draw sprites
+        # images
         SCREEN.blit(IMAGES['background'], (0,0))
         SCREEN.blit(IMAGES['player'][playerIndex],
                     (playerx, playery + playerShmVals['val']))
@@ -370,7 +367,7 @@ def mainGame(movementInfo):
     basex = movementInfo['basex']
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
 
-    # get 2 new pipes to add to upperPipes lowerPipes list
+    # 2 pipes to load
     newPipe1 = getRandomPipe()
     newPipe2 = getRandomPipe()
 
@@ -388,7 +385,7 @@ def mainGame(movementInfo):
 
     pipeVelX = -4
 
-    # player velocity, max velocity, downward accleration, accleration on flap
+    # player speed and movements
     playerVelY    =  -9   # player's velocity along Y, default same as playerFlapped
     playerMaxVelY =  10   # max vel along Y, max descend speed
     playerMinVelY =  -8   # min vel along Y, max ascend speed
@@ -411,7 +408,7 @@ def mainGame(movementInfo):
                     playerFlapped = True
                     SOUNDS['wing'].play()
 
-        # check for crash here
+        # check for crash
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
         if crashTest[0]:
@@ -426,7 +423,7 @@ def mainGame(movementInfo):
                 'playerRot': playerRot
             }
 
-        # check for score
+        # score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
         for pipe in upperPipes:
             pipeMidPos = pipe['x'] + IMAGES['pipe'][0].get_width() / 2
@@ -434,23 +431,23 @@ def mainGame(movementInfo):
                 score += 1
                 SOUNDS['point'].play()
 
-        # playerIndex basex change
+        
         if (loopIter + 1) % 3 == 0:
             playerIndex = next(playerIndexGen)
         loopIter = (loopIter + 1) % 30
         basex = -((-basex + 100) % baseShift)
 
-        # rotate the player
+        # rotate the animal
         if playerRot > -90:
             playerRot -= playerVelRot
 
-        # player's movement
+        # movement of user
         if playerVelY < playerMaxVelY and not playerFlapped:
             playerVelY += playerAccY
         if playerFlapped:
             playerFlapped = False
 
-            # more rotation to cover the threshold (calculated in visible rotation)
+           
             playerRot = 45
 
         playerHeight = IMAGES['player'][playerIndex].get_height()
@@ -461,7 +458,7 @@ def mainGame(movementInfo):
             uPipe['x'] += pipeVelX
             lPipe['x'] += pipeVelX
 
-        # add new pipe when first pipe is about to touch left of screen
+        # add new pipes when the pipes are about to be out of the screen
         if len(upperPipes) > 0 and 0 < upperPipes[0]['x'] < 5:
             newPipe = getRandomPipe()
             upperPipes.append(newPipe[0])
@@ -472,7 +469,7 @@ def mainGame(movementInfo):
             upperPipes.pop(0)
             lowerPipes.pop(0)
 
-        # draw sprites
+        # get images
         SCREEN.blit(IMAGES['background'], (0,0))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
@@ -480,10 +477,9 @@ def mainGame(movementInfo):
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
-        # print score so player overlaps the score
+      
         showScore(score)
 
-        # Player rotation has a threshold
         visibleRot = playerRotThr
         if playerRot <= playerRotThr:
             visibleRot = playerRot
@@ -524,11 +520,11 @@ def showGameOverScreen(crashInfo):
                 if playery + playerHeight >= BASEY - 1:
                     return
 
-        # player y shift
+      
         if playery + playerHeight < BASEY - 1:
             playery += min(playerVelY, BASEY - playery - playerHeight)
 
-        # player velocity change
+        
         if playerVelY < 15:
             playerVelY += playerAccY
 
@@ -537,7 +533,6 @@ def showGameOverScreen(crashInfo):
             if playerRot > -90:
                 playerRot -= playerVelRot
 
-        # Take file from sprites
         SCREEN.blit(IMAGES['background'], (0,0))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
