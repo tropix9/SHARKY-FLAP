@@ -1,3 +1,14 @@
+#Program Header
+#Name: Liam Van Spall
+#Date: Janruary 23, 2023
+#Program Name: Sealife Saver
+#Purpose: Sealife Saver, game based on a childhood favourite game, flappy bird. This game shows that there is a lot of plastic waste in the ocean and that the animals have a hard time serviving. The game is coded in pygame.
+
+
+
+
+
+
 from itertools import cycle
 import random
 import sys
@@ -5,30 +16,194 @@ import sys
 import pygame
 from pygame.locals import *
 
+import csv
+import sys
+import string 
 
+
+
+
+
+
+      
+
+def main():
+   menu()
+
+def menu():
+    print("************Welcome to Sea**************")
+    print()
+
+    choice = input("""
+                      A: Please Register
+                      B: Login
+                      Q: Logout
+
+                      Please enter your choice: """)
+
+    if choice == "A" or choice =="a":
+        register()
+    elif choice == "B" or choice =="b":
+        login()
+    elif choice=="Q" or choice=="q":
+        sys.exit
+    else:
+        print("You must only select either A or B")
+        print("Please try again")
+        menu()
+
+def long_enough(pw):
+    'Password must be at least 6 characters'
+    return len(pw) >= 6
+
+def short_enough(pw):
+    'Password cannot be more than 12 characters'
+    return len(pw) <= 12
+
+def has_lowercase(pw):
+    'Password must contain a lowercase letter'
+    return len(set(string.ascii_lowercase).intersection(pw)) > 0
+
+def has_uppercase(pw):
+    'Password must contain an uppercase letter'
+    return len(set(string.ascii_uppercase).intersection(pw)) > 0
+
+def has_numeric(pw):
+    'Password must contain a digit'
+    return len(set(string.digits).intersection(pw)) > 0
+
+def has_special(pw):
+    'Password must contain a special character'
+    return len(set(string.punctuation).intersection(pw)) > 0
+
+def test_password(pw, tests=[long_enough, short_enough, has_lowercase, has_uppercase, has_numeric, has_special]):
+    for test in tests:
+        if not test(pw):
+            print(test.__doc__)
+            return False
+    return True
+
+
+def register():
+  
+    #user is told to fill out all the required fields
+    print("Enter first name")
+    global firstname
+    firstname=input()
+    print("Enter surname")
+    global surname
+    surname=input()
+    dob=input()
+    print("Enter email address")
+    global email
+    email=input()
+    substring=dob[-4:] 
+    print("Your unique username is", firstname+surname+substring)
+    global username
+    username=firstname+surname+substring
+   #makes sure password is nice and secure
+    passwordchecker()
+    
+                   
+
+def passwordchecker():
+   password=input("Please enter a password (<6 characters >12 characters, special character, capital")
+   if test_password(password):
+       with open('fakeflixfile.txt','a') as fakeflixfile:
+        fakeflixfileWriter=csv.writer(fakeflixfile)
+        fakeflixfileWriter.writerow([username,password,firstname,surname,email])
+        print("Record has been written to file")
+        fakeflixfile.close()
+        menu()
+   else:
+         passwordchecker()
+         
+    
+def login():
+   #set a variable (boolean type) to true if the user is NOT logged on
+   notloggedin="true"
+   #while the user is not logged on (i.e. while the login credentials provided do not work ...)
+   while notloggedin=="true":
+      print("***WELCOME - PLEASE LOGIN")
+   
+   #open the file we are reading from
+      with open("fakeflixfile.txt",'r') as fakeflixfile:
+     #prompt the user to enter their login details
+         username=input("Enter Name:-")
+         password=input("Enter password (after entering password, press enter twice):-")
+      #call upon our reader (this allows us to work with our file)
+         fakeflixfileReader=csv.reader(fakeflixfile)
+      #for each row that is read by the Reader
+         for row in fakeflixfileReader:
+            for field in row:
+            
+            #search for the required matches in user entry against what is stored in the file
+               if field==username and row[1]==password:
+                  print("Granted")
+                  displayfilms()
+                  notloggedin="false"
+                
+              
+               
+         
+                                 
+              
+     
+     
+
+def displayfilms():
+   print("*******************WELCOME to SeaLife Saver**************************")
+   
+   
+      
+    
+main()
+
+
+while True:
+    try:
+        washroom_choice = int(input(" \n  \n \n PRESS 1 To View How to Play/Credits, Press 0 To go straight to Game : \n  "))
+        print("")
+        if (washroom_choice != 1 and washroom_choice != 0):
+            print("MUST CHOOSE OPTION 1 or 0")
+            print("")
+            continue
+        else:
+            break
+    except ValueError: #error checking 
+        print("")
+        print("MUST BE ONE OF THE OPTIONS")
+        print("")
+if (washroom_choice == 1): #if its 1, print whats under
+  print ('''SeaLife Saver is by LVS
+            The objective is to get past the plastic waste in the ocean to save the animal
+            1. Press Spacebar to start the game
+            2. Keep cliking Spacebar to move your animal
+            3. If you hit to bottom of the ocean or run into plastic waste,
+                you may click Spacebar to play again''')
 FPS = 30
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
-PIPEGAPSIZE  = 130 # gap between upper and lower part of pipe
+PIPEGAPSIZE  = 140 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
-    # red bird
+    # shark
     (
         'assets/sprites/redbird-upflap.png',
         'assets/sprites/redbird-midflap.png',
         'assets/sprites/redbird-downflap.png',
     ),
-    # blue bird
+    # Fish
     (
         'assets/sprites/bluebird-upflap.png',
         'assets/sprites/bluebird-midflap.png',
         'assets/sprites/bluebird-downflap.png',
     ),
-    # yellow bird
+    # Turtle
     (
         'assets/sprites/yellowbird-upflap.png',
         'assets/sprites/yellowbird-midflap.png',
@@ -42,7 +217,7 @@ BACKGROUNDS_LIST = (
     'assets/sprites/background-night.png',
 )
 
-# list of pipes
+# list of plastic waste
 PIPES_LIST = (
     'assets/sprites/pipe-green.png',
     'assets/sprites/pipe-red.png',
@@ -60,7 +235,7 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-    pygame.display.set_caption('Flappy Bird')
+    pygame.display.set_caption('SeaLife Saver')
 
     # numbers sprites for score display
     IMAGES['numbers'] = (
@@ -135,7 +310,7 @@ def main():
 
 
 def showWelcomeAnimation():
-    """Shows welcome screen animation of flappy bird"""
+    """Shows welcome screen animation of Sealife Saver"""
     # index of player to blit on screen
     playerIndex = 0
     playerIndexGen = cycle([0, 1, 2, 1])
@@ -362,7 +537,7 @@ def showGameOverScreen(crashInfo):
             if playerRot > -90:
                 playerRot -= playerVelRot
 
-        # draw sprites
+        # Take file from sprites
         SCREEN.blit(IMAGES['background'], (0,0))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
@@ -396,7 +571,7 @@ def playerShm(playerShm):
 
 def getRandomPipe():
     """returns a randomly generated pipe"""
-    # y of gap between upper and lower pipe
+    # gap between upper and lower pipe
     gapY = random.randrange(0, int(BASEY * 0.6 - PIPEGAPSIZE))
     gapY += int(BASEY * 0.2)
     pipeHeight = IMAGES['pipe'][0].get_height()
@@ -411,7 +586,7 @@ def getRandomPipe():
 def showScore(score):
     """displays score in center of screen"""
     scoreDigits = [int(x) for x in list(str(score))]
-    totalWidth = 0 # total width of all numbers to be printed
+    totalWidth = 0 
 
     for digit in scoreDigits:
         totalWidth += IMAGES['numbers'][digit].get_width()
@@ -429,7 +604,7 @@ def checkCrash(player, upperPipes, lowerPipes):
     player['w'] = IMAGES['player'][0].get_width()
     player['h'] = IMAGES['player'][0].get_height()
 
-    # if player crashes into ground
+    # if animal crashes into bottom of ocean
     if player['y'] + player['h'] >= BASEY - 1:
         return [True, True]
     else:
@@ -440,16 +615,16 @@ def checkCrash(player, upperPipes, lowerPipes):
         pipeH = IMAGES['pipe'][0].get_height()
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            # upper and lower pipe rects
+           
             uPipeRect = pygame.Rect(uPipe['x'], uPipe['y'], pipeW, pipeH)
             lPipeRect = pygame.Rect(lPipe['x'], lPipe['y'], pipeW, pipeH)
 
-            # player and upper/lower pipe hitmasks
+            
             pHitMask = HITMASKS['player'][pi]
             uHitmask = HITMASKS['pipe'][0]
             lHitmask = HITMASKS['pipe'][1]
 
-            # if bird collided with upipe or lpipe
+            # if animal hits pipe
             uCollide = pixelCollision(playerRect, uPipeRect, pHitMask, uHitmask)
             lCollide = pixelCollision(playerRect, lPipeRect, pHitMask, lHitmask)
 
@@ -485,10 +660,3 @@ def getHitmask(image):
 
 if __name__ == '__main__':
     main()
-
-"""
-######################## Credits ########################
-
-Project Clone of:
-https://www.elecrow.com/blog/how-to-program-python-game-flappy-bird-on-crowpi.html
-"""
